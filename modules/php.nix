@@ -3,6 +3,11 @@
 let
   cfg = config.kellerkinder;
 
+  phpVersion = if builtins.hasAttr "PHP_VERSION" config.env then config.env.PHP_VERSION else cfg.phpVersion;
+  package = inputs.phps.packages.${pkgs.stdenv.system}.${phpVersion};
+  phpDrvVersion = lib.getVersion package;
+  isGE83 = lib.versionAtLeast phpDrvVersion "8.3";
+
   phpConfig = lib.strings.concatStrings [
     ''
       memory_limit = -1
@@ -17,7 +22,6 @@ let
       html_errors = true
       max_execution_time = 60
       max_input_time = 60
-      assert.active = 0
       zend.detect_unicode = 0
       opcache.memory_consumption = 256M
       opcache.interned_strings_buffer = 20
@@ -32,11 +36,11 @@ let
       xdebug.var_display_max_data = -1
       xdebug.var_display_max_children = -1
     ''
+    (lib.strings.optionalString (!isGE83) ''
+      assert.active = 0
+    '')
     cfg.additionalPhpConfig
   ];
-
-  phpVersion = if builtins.hasAttr "PHP_VERSION" config.env then config.env.PHP_VERSION else cfg.phpVersion;
-  package = inputs.phps.packages.${pkgs.stdenv.system}.${phpVersion};
 
   phpPackage = package.buildEnv {
     extensions = { all, enabled }: with all; enabled
