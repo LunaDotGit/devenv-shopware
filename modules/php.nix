@@ -18,7 +18,6 @@ let
       session.gc_probability = 0
       display_errors = On
       display_startup_errors = true
-      error_reporting = E_ALL
       html_errors = true
       max_execution_time = 60
       max_input_time = 60
@@ -38,6 +37,7 @@ let
     ''
     (lib.strings.optionalString (!isGE83) ''
       assert.active = 0
+      error_reporting = E_ALL
     '')
     (lib.strings.optionalString (isGE83) ''
       error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
