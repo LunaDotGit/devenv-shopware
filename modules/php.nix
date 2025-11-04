@@ -39,6 +39,9 @@ let
     (lib.strings.optionalString (!isGE83) ''
       assert.active = 0
     '')
+    (lib.strings.optionalString (isGE83) ''
+      error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+    '')
     cfg.additionalPhpConfig
   ];
 
